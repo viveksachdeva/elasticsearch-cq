@@ -31,3 +31,4 @@ mvn -Dcrx.host=otherhost -Dcrx.port=5502 <goals>
 elastic-cq5
 
 Integrating Elastic Search With CQ5/AEM
+elasticsearch-cq
