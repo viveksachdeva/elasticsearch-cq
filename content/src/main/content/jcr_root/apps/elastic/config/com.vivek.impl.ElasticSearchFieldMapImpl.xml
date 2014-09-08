@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0"
+          jcr:primaryType="sling:OsgiConfig"
+          page.indexed.values="[titleText=jcr:title,description=jcr:description,pageTags=cq:tags]"
+          asset.indexed.values="[titleText=dc:title,description=dc:description,format=dc:format,damTags=cq:tags]"
+          search.engine.url="http://localhost:9200/vivek/test"/>
