@@ -45,13 +45,24 @@ class FreeTextSearchServlet extends SlingAllMethodsServlet {
     @Override
     protected void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response) throws IOException {
         response.setContentType("application/json")
-        response.getWriter().write(fetchMatchingPages(request.getParameter("searchTerm")))
+        String facetId = request.getParameter("facetName")
+        response.getWriter().write(fetchMatchingPages(request.getParameter("searchTerm"), facetId))
     }
 
-    String fetchMatchingPages(String textToSearch) {
-        SearchRequestBuilder requestBuilder = client.prepareSearch("bank")
-        QueryBuilder queryBuilder = QueryBuilders.matchQuery("address", textToSearch)
+    String fetchMatchingPages(String textToSearch, String facetId) {
+        SearchRequestBuilder requestBuilder = client.prepareSearch("vivek").setTypes("pages").setSize(20)
+        def taggedPages = []
+//        QueryBuilder queryBuilder = QueryBuilders.matchQuery("page", textToSearch)
+        if (facetId) {
+            def tagResults = client.prepareSearch("vivek").setTypes("tags").setQuery(QueryBuilders.termQuery("tagId_facet", facetId?.trim())).execute().get()
+            taggedPages = tagResults.hits.hits*.source*.pageId
+        }
+        QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery(textToSearch, "titleText", "description", "pageTags")
+        if (taggedPages) {
+            queryBuilder = QueryBuilders.boolQuery().must(QueryBuilders.multiMatchQuery(textToSearch, "titleText", "description", "pageTags")).must(QueryBuilders.termsQuery("docId_sort", taggedPages).minimumShouldMatch("1"));
+        }
         SearchResponse facetResults = requestBuilder.setQuery(queryBuilder).execute().get()
         return facetResults.toString()
     }
 }
+

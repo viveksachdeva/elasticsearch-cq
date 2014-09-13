@@ -53,22 +53,21 @@ class ElasticSearchOperationImpl implements ElasticSearchOperation {
         try {
             def id = elasticSearchUtil.checkIfPageExistsOnElastic(jsonObject.get("docId").toString())
             if (id) {
+                LOG.info("Page exists::::::::::::::::::::")
 //                 Update existing document
+//                client.prepareDeleteByQuery("vivek").setTypes("tags").
+//                        setQuery(QueryBuilders.termQuery("pageId_sort", jsonObject.get("docId")))
+//                        .execute()
+//                        .actionGet();
                 client.prepareIndex("vivek", "pages", id.first())
                         .setSource(jsonObject.toString())
                         .execute()
                         .actionGet();
-                client.prepareDeleteByQuery("vivek").setTypes("tags").
-                        setQuery(QueryBuilders.termQuery("pageId_sort", jsonObject.get("docId")))
-                        .execute()
-                        .actionGet();
-                addTagToElasticSearch(jsonObject)
             } else {
 //                New document Added
                 indexNewDocument("vivek", "pages", jsonObject)
-                addTagToElasticSearch(jsonObject)
-
             }
+            addTagToElasticSearch(jsonObject)
         }
         catch (Exception e) {
             //If there is any exception, it stays in the replication queue
@@ -93,10 +92,21 @@ class ElasticSearchOperationImpl implements ElasticSearchOperation {
             String allTags = jsonObject.get("pageTags")?.toString()
             allTags.substring(1, allTags.length() - 1).tokenize(",").each {
                 JSONObject tagJSON = new JSONObject();
-                tagJSON.put("pageId", jsonObject.get("docId"))
-                tagJSON.put("tagId", it.trim())
-                indexNewDocument("vivek", "tags", tagJSON)
+                QueryBuilder queryBuilder = QueryBuilders.termQuery("tagId_facet", it.trim())
+                QueryBuilder queryBuilder2 = QueryBuilders.termQuery("pageId_sort", jsonObject.get("docId").toString())
+
+                SearchRequestBuilder requestBuilder = client.prepareSearch("vivek")
+                        .setTypes("tags")
+                SearchResponse searchResponse = requestBuilder.setQuery(QueryBuilders.boolQuery().must(queryBuilder).must(queryBuilder2)).execute().get()
+                Integer totalHits = searchResponse.hits.totalHits
+                if (totalHits == 0) {
+                    tagJSON.put("pageId", jsonObject.get("docId"))
+                    tagJSON.put("tagId", it.trim())
+                    indexNewDocument("vivek", "tags", tagJSON)
+                }
+
             }
         }
     }
 }
+

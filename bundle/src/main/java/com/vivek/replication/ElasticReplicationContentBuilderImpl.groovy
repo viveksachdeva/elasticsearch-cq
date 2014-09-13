@@ -106,6 +106,7 @@ class ElasticReplicationContentBuilderImpl implements ContentBuilder {
                 return pageActivationEvent(resourceResolver, currentResUri, factory);
             }
         }
+        LOG.error("Hitting blank data in modification event")
         return blankData();
     }
 
@@ -122,6 +123,7 @@ class ElasticReplicationContentBuilderImpl implements ContentBuilder {
     private ReplicationContent pageActivationEvent(ResourceResolver resourceResolver, String currentUri, ReplicationContentFactory factory) throws ServletException, IOException {
         String jsonData = generateJSONDataForElastic(resourceResolver, "${currentUri}.elas.json");
         String retVal = elasticSearchOperation.indexDataOnElasticServer(new JSONObject(jsonData))
+        LOG.info(":::::returned from indexing:::${retVal}")
         String outputData = "{\"message\":\"${retVal}\"}"
         return (!retVal.contains("Exception")) ? createReplicationData(factory, outputData) : blankData();
     }
@@ -201,6 +203,7 @@ class ElasticReplicationContentBuilderImpl implements ContentBuilder {
             resourceResolver?.close();
             LOG.debug("finally executed successfully");
         }
+        LOG.info("Returning blank data from create")
         return blankData();
     }
 
@@ -214,3 +217,4 @@ class ElasticReplicationContentBuilderImpl implements ContentBuilder {
         return title
     }
 }
+
