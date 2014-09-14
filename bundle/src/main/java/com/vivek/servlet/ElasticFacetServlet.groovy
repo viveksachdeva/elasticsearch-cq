@@ -60,4 +60,3 @@ class ElasticFacetServlet extends SlingAllMethodsServlet {
         return facetResults
     }
 }
-

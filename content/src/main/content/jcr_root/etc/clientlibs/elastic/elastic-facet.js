@@ -25,7 +25,8 @@ $(document).ready(function () {
         performFreeTextSearch();
     });
 
-    function performFreeTextSearch(facetId){
+    function performFreeTextSearch(facetId) {
+        var searchPath = $("#search-root").val();
         var searchFor = $("input[name=search-field]").val();
         var searchData = "<div style='width:70%'><h2>Search Results(In Order of relevancy)</h2>"
         searchData = searchData + "<ul>"
@@ -34,7 +35,7 @@ $(document).ready(function () {
         $.ajax({
             dataType: 'json',
             url: '/bin/searchPages',
-            data: {searchTerm: searchFor, facetName : facetId},
+            data: {searchTerm: searchFor, facetName: facetId, searchIn: searchPath},
             success: function (data) {
                 if (data.hits.total > 0) {
                     var outputjson = data.hits.hits;
@@ -44,7 +45,7 @@ $(document).ready(function () {
                     }
 
                 }
-                else{
+                else {
                     searchData = searchData + "<div style='clear:both'>No results found</div>"
                 }
                 searchData = searchData + "</ul></div>"

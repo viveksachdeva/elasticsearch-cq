@@ -217,4 +217,3 @@ class ElasticReplicationContentBuilderImpl implements ContentBuilder {
         return title
     }
 }
-

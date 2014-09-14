@@ -46,10 +46,10 @@ class FreeTextSearchServlet extends SlingAllMethodsServlet {
     protected void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response) throws IOException {
         response.setContentType("application/json")
         String facetId = request.getParameter("facetName")
-        response.getWriter().write(fetchMatchingPages(request.getParameter("searchTerm"), facetId))
+        response.getWriter().write(fetchMatchingPages(request.getParameter("searchTerm"), facetId, request.getParameter("searchIn")))
     }
 
-    String fetchMatchingPages(String textToSearch, String facetId) {
+    String fetchMatchingPages(String textToSearch, String facetId, String searchPath) {
         SearchRequestBuilder requestBuilder = client.prepareSearch("vivek").setTypes("pages").setSize(20)
         def taggedPages = []
 //        QueryBuilder queryBuilder = QueryBuilders.matchQuery("page", textToSearch)
@@ -57,12 +57,12 @@ class FreeTextSearchServlet extends SlingAllMethodsServlet {
             def tagResults = client.prepareSearch("vivek").setTypes("tags").setQuery(QueryBuilders.termQuery("tagId_facet", facetId?.trim())).execute().get()
             taggedPages = tagResults.hits.hits*.source*.pageId
         }
-        QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery(textToSearch, "titleText", "description", "pageTags")
+        QueryBuilder queryBuilder = QueryBuilders.boolQuery().must(QueryBuilders.multiMatchQuery(textToSearch, "titleText", "description", "pageTags")).must(QueryBuilders.wildcardQuery("docId_sort","${searchPath}*"))
         if (taggedPages) {
-            queryBuilder = QueryBuilders.boolQuery().must(QueryBuilders.multiMatchQuery(textToSearch, "titleText", "description", "pageTags")).must(QueryBuilders.termsQuery("docId_sort", taggedPages).minimumShouldMatch("1"));
+            queryBuilder = QueryBuilders.boolQuery().must(QueryBuilders.multiMatchQuery(textToSearch, "titleText", "description", "pageTags")).must(QueryBuilders.wildcardQuery("docId_sort","${searchPath}*")).must(QueryBuilders.termsQuery("docId_sort", taggedPages).minimumShouldMatch("1"));
         }
+        LOG.info("Query is::${queryBuilder.toString()}")
         SearchResponse facetResults = requestBuilder.setQuery(queryBuilder).execute().get()
         return facetResults.toString()
     }
 }
-
