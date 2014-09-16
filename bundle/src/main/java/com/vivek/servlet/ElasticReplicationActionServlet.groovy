@@ -1,3 +1,5 @@
+// TODO : Instead of this... Implement a custom transport handler as ElasticServer sends 201 on success but CQ expects 200
+
 package com.vivek.servlet
 
 import org.apache.felix.scr.annotations.Component
@@ -41,8 +43,8 @@ class ElasticReplicationActionServlet  extends SlingAllMethodsServlet {
     protected void doPost(SlingHttpServletRequest request, SlingHttpServletResponse response) throws IOException {
         response.setContentType("text/plain");
         Integer contentLength =  request.getHeader("Content-Length") as Integer
-        if (contentLength == 0){
-            response.setStatus(400)
-        }
+        // if (contentLength == 0){
+        //     response.setStatus(400)
+        // }
     }
 }
