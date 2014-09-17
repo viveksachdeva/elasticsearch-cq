@@ -124,7 +124,7 @@ class ElasticReplicationContentBuilderImpl implements ContentBuilder {
         String jsonData = generateJSONDataForElastic(resourceResolver, "${currentUri}.elas.json");
         String retVal = elasticSearchOperation.indexDataOnElasticServer(new JSONObject(jsonData))
         LOG.info(":::::returned from indexing:::${retVal}")
-        String outputData = "{\"message\":\"${retVal}\"}"
+        String outputData = "{\"message\":\"${retVal}\", \"resourceUri\": \"${currentUri}\"}"
         return (!retVal.contains("Exception")) ? createReplicationData(factory, outputData) : blankData();
     }
 
@@ -217,3 +217,4 @@ class ElasticReplicationContentBuilderImpl implements ContentBuilder {
         return title
     }
 }
+
