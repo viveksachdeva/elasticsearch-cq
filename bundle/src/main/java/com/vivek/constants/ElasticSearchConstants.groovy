@@ -53,6 +53,7 @@ public interface ElasticSearchConstants {
    }
 }"""
 
-    Integer TRANSPORT_PORT = 9300
+    Integer TRANSPORT_PORT_1 = 9300
+    Integer TRANSPORT_PORT_2 = 9301
 
 }

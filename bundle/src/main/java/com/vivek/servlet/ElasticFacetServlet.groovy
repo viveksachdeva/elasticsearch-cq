@@ -50,13 +50,14 @@ class ElasticFacetServlet extends SlingAllMethodsServlet {
 
     String generateFacet(String fieldName, Boolean showAll = false, List filteredPages) {
         SearchRequestBuilder requestBuilder = client.prepareSearch("vivek")
-                .setTypes("tags").setSize(20)
+                .setTypes("tags").setSize(100)
         if (!showAll){
 //            requestBuilder.setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(), FilterBuilders.termFilter("pageId_sort", filteredPages ?: "")))
             requestBuilder.setQuery(QueryBuilders.termsQuery("pageId_sort", filteredPages?:"").minimumShouldMatch("1"))
             LOG.info("::::facet query::${QueryBuilders.termsQuery("pageId_sort", filteredPages?:"").minimumShouldMatch("1")}")
         }
-        String facetResults = requestBuilder.addFacet(FacetBuilders.termsFacet("tagFacet").field(fieldName).allTerms(true)).execute().get().toString()
+        String facetResults = requestBuilder.addFacet(FacetBuilders.termsFacet("tagFacet").size(Integer.MAX_VALUE).field(fieldName).allTerms(true)).execute().get().toString()
         return facetResults
     }
 }
+

@@ -19,7 +19,8 @@ class ClientNodeFactoryBean implements FactoryBean {
             client = new TransportClient(settingsBuilder())
 
             // Configure transport addresses
-            client.addTransportAddress(new InetSocketTransportAddress('localhost', ElasticSearchConstants.TRANSPORT_PORT))
+            client.addTransportAddress(new InetSocketTransportAddress('localhost', ElasticSearchConstants.TRANSPORT_PORT_1))
+            client.addTransportAddress(new InetSocketTransportAddress('localhost', ElasticSearchConstants.TRANSPORT_PORT_2))
 
         }
         return client

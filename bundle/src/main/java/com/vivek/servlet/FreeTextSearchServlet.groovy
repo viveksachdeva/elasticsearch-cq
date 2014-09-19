@@ -50,11 +50,11 @@ class FreeTextSearchServlet extends SlingAllMethodsServlet {
     }
 
     String fetchMatchingPages(String textToSearch, String facetId, String searchPath) {
-        SearchRequestBuilder requestBuilder = client.prepareSearch("vivek").setTypes("pages").setSize(20)
+        SearchRequestBuilder requestBuilder = client.prepareSearch("vivek").setTypes("pages").setSize(100)
         def taggedPages = []
 //        QueryBuilder queryBuilder = QueryBuilders.matchQuery("page", textToSearch)
         if (facetId) {
-            def tagResults = client.prepareSearch("vivek").setTypes("tags").setQuery(QueryBuilders.termQuery("tagId_facet", facetId?.trim())).execute().get()
+            def tagResults = client.prepareSearch("vivek").setTypes("tags").setSize(100).setQuery(QueryBuilders.termQuery("tagId_facet", facetId?.trim())).execute().get()
             taggedPages = tagResults.hits.hits*.source*.pageId
         }
         QueryBuilder queryBuilder = QueryBuilders.boolQuery().must(QueryBuilders.multiMatchQuery(textToSearch, "titleText", "description", "pageTags")).must(QueryBuilders.wildcardQuery("docId_sort","${searchPath}*"))
@@ -66,3 +66,4 @@ class FreeTextSearchServlet extends SlingAllMethodsServlet {
         return facetResults.toString()
     }
 }
+

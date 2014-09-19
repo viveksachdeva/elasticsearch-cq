@@ -36,12 +36,7 @@ class CustomTransportHandler implements TransportHandler {
 
     @Override
     boolean canHandle(AgentConfig agentConfig) {
-        if (agentConfig.transportURI.toLowerCase().contains("elastic")) {
-            println ":::::::AgenURL:::${agentConfig.transportURI}::::"
-            return true
-        } else
-            return false
-
+        agentConfig.transportURI.toLowerCase().contains("elastic")
     }
 
     @Override
@@ -51,7 +46,6 @@ class CustomTransportHandler implements TransportHandler {
         String replicationMessage = replicationTransaction.content.inputStream.text
         JSONObject jsonObject = new JSONObject(replicationMessage)
         if (replicationMessage?.toLowerCase()?.contains("exception")) {
-
             try {
                 resourceResolver = resourceResolverFactory.getAdministrativeResourceResolver(null);
                 session = resourceResolver.adaptTo(Session.class);
@@ -63,10 +57,9 @@ class CustomTransportHandler implements TransportHandler {
             finally {
                 session?.logout()
                 resourceResolver?.close()
-                return null
             }
-        } else {
-            return ReplicationResult.OK
         }
+        return ReplicationResult.OK
     }
 }
+
